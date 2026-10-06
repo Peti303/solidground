@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolidGround — Concrete & Outdoor Construction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --glass-shadow: rgba(0, 0, 0, 0.08);
+            --accent: #8b7355;
+            --accent-soft: rgba(139, 115, 85, 0.1);
+            --card-glass: rgba(255, 255, 255, 0.72);
+            --card-shadow: rgba(0, 0, 0, 0.1);
+            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --text-primary: #f5f5f5;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            --glass-bg: rgba(20, 20, 20, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --glass-shadow: rgba(0, 0, 0, 0.4);
+            --accent: #a08060;
+            --accent-soft: rgba(160, 128, 96, 0.15);
+            --card-glass: rgba(30, 30, 30, 0.82);
+            --card-shadow: rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none !important;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.6s var(--transition-smooth), 
+                        color 0.6s var(--transition-smooth);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           CUSTOM CURSOR STYLES
+           ============================================ */
+        .cursor-dot {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10001;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s var(--transition-smooth),
+                        height 0.2s var(--transition-smooth);
+        }
+
+        .cursor-ring {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 32px;
+            height: 32px;
+            border: 1.5px solid var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s var(--transition-smooth),
+                        height 0.2s var(--transition-smooth),
+                        border-width 0.2s var(--transition-smooth);
+            opacity: 0.7;
+        }
+
+        .cursor-dot.hovering {
+            width: 12px;
+            height: 12px;
+        }
+
+        .cursor-ring.hovering {
+            width: 48px;
+            height: 48px;
+            border-width: 2px;
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .cursor-dot,
+            .cursor-ring {
+                display: none !important;
+            }
+            
+            * {
+                cursor: auto !important;
+            }
+        }
+
+        /* Ambient Background */
+        .ambient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            transition: opacity 0.8s var(--transition-smooth);
+        }
+
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: var(--accent);
+            top: -200px;
+            right: -200px;
+            opacity: 0.1;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent);
+            bottom: 0;
+            left: -150px;
+            opacity: 0.08;
+        }
+
+        .orb-3 {
+            width: 350px;
+            height: 350px;
+            background: var(--accent);
+            top: 40%;
+            right: 5%;
+            opacity: 0.05;
+        }
+
+        /* Header */
+        .header-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            padding: 1.25rem 2rem;
+            transition: padding 0.5s var(--transition-smooth);
+        }
+
+        .header-wrapper.scrolled {
+            padding: 0.875rem 2rem;
+        }
+
+        header {
+            width: 100%;
+            max-width: 100%;
+            padding: 0.875rem 1.75rem;
+            border-radius: 0;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            transition: all 0.5s var(--transition-smooth);
+        }
+
+        .header-wrapper.scrolled header {
+            max-width: 720px;
+            padding: 0.75rem 1.5rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px) saturate(160%);
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            box-shadow: 0 8px 32px var(--glass-shadow),
+                        0 0 0 1px var(--glass-border);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: transform 0.3s var(--transition-smooth);
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s var(--transition-smooth);
+            pointer-events: none;
+        }
+
+        .logo:hover .logo-icon {
+            transform: rotate(-5deg);
+        }
+
+        .logo-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: white;
+            pointer-events: none;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 1.75rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.25rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: color 0.3s var(--transition-smooth);
+            position: relative;
+            padding: 0.25rem 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s var(--transition-smooth);
+            border-radius: 2px;
+            pointer-events: none;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            background: var(--accent-soft);
+            border-radius: 20px;
+            cursor: none;
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: all 0.4s var(--transition-smooth);
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .toggle-thumb {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--bg-secondary);
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.5s var(--transition-bounce),
+                        box-shadow 0.4s var(--transition-smooth);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        [data-theme="dark"] .toggle-thumb {
+            transform: translateX(24px);
+        }
+
+        .sun-icon, .moon-icon {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            transition: all 0.5s var(--transition-smooth);
+            pointer-events: none;
+        }
+
+        .sun-icon {
+            color: #f59e0b;
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        .moon-icon {
+            color: #6366f1;
+            opacity: 0;
+            transform: rotate(-90deg) scale(0.5);
+        }
+
+        [data-theme="dark"] .sun-icon {
+            opacity: 0;
+            transform: rotate(90deg) scale(0.5);
+        }
+
+        [data-theme="dark"] .moon-icon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        .toggle-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(251, 191, 36, 0.4), transparent 60%);
+            transition: all 0.5s var(--transition-smooth);
+            pointer-events: none;
+        }
+
+        [data-theme="dark"] .toggle-glow {
+            background: radial-gradient(circle at 80% 50%, rgba(99, 102, 241, 0.4), transparent 60%);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            cursor: none;
+            padding: 0.5rem;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mobile-menu-btn span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: var(--text-primary);
+            transition: all 0.3s var(--transition-smooth);
+            border-radius: 2px;
+            pointer-events: none;
+        }
+
+        /* ============================================
+           HERO SECTION
+           FIX: isolation: isolate creates a new stacking
+           context so cards cannot overlap this section
+           ============================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 6rem 2rem 4rem;
+            position: relative;
+            z-index: 2; /* RAISED above cards section */
+            /* Creates isolated stacking context */
+            isolation: isolate;
+        }
+
+        .hero-content {
+            max-width: 750px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 1.1rem;
+            background: var(--accent-soft);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 1.75rem;
+            border: 1px solid var(--accent);
+            letter-spacing: 0.5px;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.25rem, 5.5vw, 4rem);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .hero h1 span {
+            color: var(--accent);
+        }
+
+        .hero p {
+            font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+            color: var(--text-secondary);
+            max-width: 520px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+
+        /* ============================================
+           HERO CTA BUTTON - COMPLETE FIX
+           
+           ROOT CAUSE IDENTIFIED:
+           The cards with translateY(-120vh) were overlapping
+           the button area invisibly and capturing pointer events.
+           
+           FIXES APPLIED:
+           1. Hero section now has isolation: isolate and z-index: 2
+           2. Cards have pointer-events: none until landed
+           3. Button structure simplified and verified
+           ============================================ */
+        
+        .hero-cta-wrapper {
+            display: inline-block;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero-cta {
+            /* Layout */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 0.9rem 1.75rem;
+            min-height: 48px;
+            line-height: 1;
+            
+            /* Default state */
+            background: #ffffff;
+            color: #1a1a1a;
+            border: 2px solid #1a1a1a;
+            border-radius: 100px;
+            
+            /* Typography */
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            
+            /* Positioning */
+            position: relative;
+            overflow: hidden;
+            
+            /* CRITICAL: Ensure button captures all events */
+            pointer-events: auto;
+            
+            /* Transitions */
+            transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        /* Fill circle - perfect circle animation */
+        .hero-cta::before {
+            content: '';
+            position: absolute;
+            width: var(--fill-size, 300px);
+            height: var(--fill-size, 300px);
+            background: #1a1a1a;
+            border-radius: 50%;
+            left: var(--fill-x, 0px);
+            top: var(--fill-y, 0px);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* CRITICAL: Must not block button interaction */
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero-cta.filling::before {
+            transform: translate(-50%, -50%) scale(1);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .hero-cta.filling {
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Button content - MUST have pointer-events: none */
+        .hero-cta-text,
+        .hero-cta-icon {
+            position: relative;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .hero-cta-text {
+            display: inline-block;
+            line-height: 1;
+        }
+
+        .hero-cta-icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            display: block;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hero-cta.filling .hero-cta-icon {
+            transform: translateX(4px);
+        }
+
+        /* Touch fallback */
+        @media (hover: none) and (pointer: coarse) {
+            .hero-cta:active {
+                background: #1a1a1a;
+                color: #ffffff;
+                transform: translateY(-1px);
+            }
+            
+            .hero-cta::before {
+                display: none;
+            }
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .scroll-indicator * {
+            pointer-events: none;
+        }
+
+        .scroll-mouse {
+            width: 22px;
+            height: 34px;
+            border: 2px solid var(--text-muted);
+            border-radius: 11px;
+            position: relative;
+            opacity: 0.5;
+        }
+
+        .scroll-mouse::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 3px;
+            animation: scrollMouse 1.6s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scrollMouse {
+            0%, 100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            50% { opacity: 0.3; transform: translateX(-50%) translateY(8px); }
+        }
+
+        /* Section Header */
+        .section-header {
+            text-align: center;
+            padding: 4rem 2rem 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-header h2 {
+            font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+            font-weight: 700;
+            letter-spacing: -0.75px;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Cards Section */
+        .cards-section {
+            position: relative;
+            z-index: 1;
+            padding: 1.5rem 0 4rem;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ============================================
+           CARD - ROOT CAUSE FIX
+           
+           Cards with translateY(-120vh) were invisibly
+           overlapping the hero button and stealing
+           pointer events.
+           
+           FIX: pointer-events: none by default,
+                pointer-events: auto only when .landed
+           ============================================ */
+        .card {
+            width: 100%;
+            max-width: 820px;
+            min-height: 145px;
+            background: var(--card-glass);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 22px;
+            padding: 1.75rem 2.25rem;
+            box-shadow: 0 20px 50px -15px var(--card-shadow),
+                        0 0 0 1px var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 1.75rem;
+            
+            opacity: 0;
+            transform: translateY(-120vh) scale(0.75);
+            will-change: transform, opacity;
+            
+            /* ========================================
+               CRITICAL FIX: 
+               Cards must not capture pointer events
+               while they're animating/invisible.
+               Only enable when fully landed.
+               ======================================== */
+            pointer-events: none;
+            
+            transition: box-shadow 0.3s var(--transition-smooth),
+                        border-color 0.3s var(--transition-smooth);
+        }
+
+        /* Only enable pointer events when card has landed */
+        .card.landed {
+            pointer-events: auto;
+            cursor: none;
+        }
+
+        .card.landed:hover {
+            box-shadow: 0 30px 60px -15px var(--card-shadow),
+                        0 0 0 2px var(--accent);
+        }
+
+        .card-icon {
+            flex-shrink: 0;
+            width: 58px;
+            height: 58px;
+            background: var(--accent-soft);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s var(--transition-smooth);
+            border: 1px solid transparent;
+            pointer-events: none;
+        }
+
+        .card.landed:hover .card-icon {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: rotate(-5deg) scale(1.08);
+        }
+
+        .card-icon svg {
+            width: 26px;
+            height: 26px;
+            color: var(--accent);
+            transition: color 0.4s var(--transition-smooth);
+            pointer-events: none;
+        }
+
+        .card.landed:hover .card-icon svg {
+            color: white;
+        }
+
+        .card-content {
+            flex: 1;
+            min-width: 0;
+            pointer-events: none;
+        }
+
+        .card-number {
+            display: inline-block;
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: var(--accent-soft);
+            padding: 0.2rem 0.6rem;
+            border-radius: 100px;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .card h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: var(--text-primary);
+            letter-spacing: -0.4px;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* Progress Indicator */
+        .progress-indicator {
+            position: fixed;
+            right: 1.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s var(--transition-smooth),
+                        visibility 0.5s var(--transition-smooth);
+            pointer-events: none;
+        }
+
+        .progress-indicator.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .progress-track {
+            width: 2px;
+            height: 80px;
+            background: var(--glass-border);
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to top, var(--accent), rgba(139, 115, 85, 0.3));
+            border-radius: 2px;
+            transition: height 0.1s linear;
+        }
+
+        .progress-dots {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .progress-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--glass-border);
+            transition: all 0.3s var(--transition-smooth);
+        }
+
+        .progress-dot.active {
+            background: var(--accent);
+            transform: scale(1.5);
+            box-shadow: 0 0 12px var(--accent);
+        }
+
+        .progress-dot.completed {
+            background: var(--accent);
+            opacity: 0.6;
+        }
+
+        .progress-label {
+            font-size: 0.55rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 1;
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--glass-border);
+            background: var(--bg-primary);
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: opacity 0.3s var(--transition-smooth);
+        }
+
+        footer a:hover {
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .header-wrapper.scrolled header {
+                max-width: 650px;
+            }
+
+            .card {
+                padding: 1.5rem 1.75rem;
+                max-width: 95%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-wrapper {
+                padding: 1rem;
+            }
+
+            .header-wrapper.scrolled {
+                padding: 0.6rem 1rem;
+            }
+
+            .header-wrapper.scrolled header {
+                max-width: calc(100% - 1rem);
+                border-radius: 14px;
+                padding: 0.65rem 1rem;
+                backdrop-filter: blur(14px) saturate(160%);
+                -webkit-backdrop-filter: blur(14px) saturate(160%);
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .hero {
+                padding: 5rem 1.5rem 3rem;
+            }
+
+            .hero h1 {
+                letter-spacing: -1px;
+            }
+
+            .section-header {
+                padding: 3rem 1.5rem 1.5rem;
+            }
+
+            .cards-section {
+                padding: 1.5rem 0 3rem;
+            }
+
+            .cards-container {
+                padding: 0 1rem;
+                gap: 1.25rem;
+            }
+
+            .card {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem 1.25rem;
+                gap: 1rem;
+                min-height: auto;
+                transform: translateY(-100vh) scale(0.78);
+            }
+
+            .card-content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .card h3 {
+                font-size: 1.05rem;
+            }
+
+            .card p {
+                font-size: 0.82rem;
+            }
+
+            .card-icon {
+                width: 50px;
+                height: 50px;
+            }
+
+            .card-icon svg {
+                width: 22px;
+                height: 22px;
+            }
+
+            .progress-indicator {
+                right: 1rem;
+            }
+
+            .progress-track {
+                height: 60px;
+            }
+
+            .scroll-indicator {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 0.95rem;
+            }
+
+            .logo-icon {
+                width: 26px;
+                height: 26px;
+            }
+
+            .logo-icon svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            .theme-toggle {
+                width: 44px;
+                height: 24px;
+            }
+
+            .toggle-thumb {
+                width: 16px;
+                height: 16px;
+            }
+
+            [data-theme="dark"] .toggle-thumb {
+                transform: translateX(20px);
+            }
+
+            .hero-badge {
+                font-size: 0.65rem;
+                padding: 0.35rem 0.9rem;
+            }
+
+            .hero-cta {
+                padding: 0.8rem 1.4rem;
+                font-size: 0.85rem;
+                min-height: 44px;
+            }
+
+            .card {
+                padding: 1.25rem 1rem;
+                border-radius: 18px;
+            }
+
+            .section-header h2 {
+                font-size: 1.35rem;
+            }
+
+            .section-header p {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .card {
+                opacity: 1 !important;
+                transform: none !important;
+                pointer-events: auto !important;
+            }
+            
+            .cursor-dot,
+            .cursor-ring {
+                transition: none !important;
+            }
+            
+            .hero-cta::before {
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <!-- Ambient Background -->
+    <div class="ambient-bg">
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+        <div class="ambient-orb orb-3"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="header-wrapper" id="headerWrapper">
+        <header id="header">
+            <div class="header-content">
+                <a href="#" class="logo" data-cursor-hover>
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    SolidGround
+                </a>
+                
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#projects">Projects</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                    
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" data-cursor-hover>
+                        <div class="toggle-glow"></div>
+                        <div class="toggle-thumb">
+                            <svg class="sun-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="12" r="4"/>
+                                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                            </svg>
+                            <svg class="moon-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                            </svg>
+                        </div>
+                    </button>
+
+                    <button class="mobile-menu-btn" aria-label="Menu" data-cursor-hover>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </nav>
+            </div>
+        </header>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">Precision Crafted Surfaces</div>
+            <h1>Building <span>Foundations</span> That Last</h1>
+            <p>Expert concrete and outdoor construction services. We transform spaces with precision, quality materials, and craftsmanship that stands the test of time.</p>
+            
+            <div class="hero-cta-wrapper">
+                <a href="#services" class="hero-cta" id="heroCta" data-cursor-hover>
+                    <span class="hero-cta-text">Explore Our Work</span>
+                    <svg class="hero-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-mouse"></div>
+            <span>Scroll</span>
+        </div>
+    </section>
+
+    <!-- Section Header -->
+    <div class="section-header" id="sectionTrigger">
+        <h2>What We Deliver</h2>
+        <p>Five pillars that define our approach</p>
+    </div>
+
+    <!-- Cards Section -->
+    <section class="cards-section" id="cardsSection">
+        <div class="cards-container" id="cardsContainer">
+            <article class="card" data-card="0" data-cursor-hover>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="M9 12l2 2 4-4"/>
+                    </svg>
+                </div>
+                <div class="card-content">
+                    <span class="card-number">Step 01</span>
+                    <h3>Unwavering Quality</h3>
+                    <p>Every project begins with our commitment to excellence. From consultation to final finish, precision guides every decision.</p>
+                </div>
+            </article>
+
+            <article class="card" data-card="1" data-cursor-hover>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M3 9h18M9 21V9"/>
+                    </svg>
+                </div>
+                <div class="card-content">
+                    <span class="card-number">Step 02</span>
+                    <h3>Premium Materials</h3>
+                    <p>We source only the finest concrete mixes and aggregates. Superior inputs create surfaces that last for decades.</p>
+                </div>
+            </article>
+
+            <article class="card" data-card="2" data-cursor-hover>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </div>
+                <div class="card-content">
+                    <span class="card-number">Step 03</span>
+                    <h3>Precision Execution</h3>
+                    <p>Millimeter accuracy in every pour. Traditional craftsmanship meets modern techniques for flawless results.</p>
+                </div>
+            </article>
+
+            <article class="card" data-card="3" data-cursor-hover>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                </div>
+                <div class="card-content">
+                    <span class="card-number">Step 04</span>
+                    <h3>Reliable Partnership</h3>
+                    <p>On time, on budget, on point. Trust is earned through consistent delivery and transparent communication.</p>
+                </div>
+            </article>
+
+            <article class="card" data-card="4" data-cursor-hover>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </div>
+                <div class="card-content">
+                    <span class="card-number">Step 05</span>
+                    <h3>Outdoor Expertise</h3>
+                    <p>Driveways, patios, pathways and beyond. We create outdoor spaces that blend function with lasting beauty.</p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- Progress Indicator -->
+    <div class="progress-indicator" id="progressIndicator">
+        <div class="progress-label">Progress</div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-dots">
+            <div class="progress-dot" data-index="0"></div>
+            <div class="progress-dot" data-index="1"></div>
+            <div class="progress-dot" data-index="2"></div>
+            <div class="progress-dot" data-index="3"></div>
+            <div class="progress-dot" data-index="4"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2024 SolidGround Construction. <a href="#" data-cursor-hover>Crafted with precision</a></p>
+    </footer>
+
+    <script>
+        // ============================================
+        // CUSTOM CURSOR SYSTEM
+        // ============================================
+        
+        class CustomCursor {
+            constructor() {
+                this.dot = document.getElementById('cursorDot');
+                this.ring = document.getElementById('cursorRing');
+                
+                this.dotX = 0;
+                this.dotY = 0;
+                this.ringX = 0;
+                this.ringY = 0;
+                this.targetX = 0;
+                this.targetY = 0;
+                
+                this.ringSpeed = 0.15;
+                this.dotSpeed = 0.8;
+                
+                this.isHovering = false;
+                this.isVisible = false;
+                
+                this.isTouchDevice = ('ontouchstart' in window) || 
+                                     (navigator.maxTouchPoints > 0);
+                
+                if (!this.isTouchDevice) {
+                    this.init();
+                }
+            }
+
+            init() {
+                document.addEventListener('mousemove', (e) => {
+                    this.targetX = e.clientX;
+                    this.targetY = e.clientY;
+                    
+                    if (!this.isVisible) {
+                        this.isVisible = true;
+                        this.dotX = this.targetX;
+                        this.dotY = this.targetY;
+                        this.ringX = this.targetX;
+                        this.ringY = this.targetY;
+                        this.dot.style.opacity = '1';
+                        this.ring.style.opacity = '0.7';
+                    }
+                }, { passive: true });
+                
+                document.addEventListener('mouseleave', () => {
+                    this.isVisible = false;
+                    this.dot.style.opacity = '0';
+                    this.ring.style.opacity = '0';
+                });
+                
+                document.addEventListener('mouseenter', () => {
+                    this.isVisible = true;
+                    this.dot.style.opacity = '1';
+                    this.ring.style.opacity = '0.7';
+                });
+                
+                this.setupHoverDetection();
+                this.animate();
+            }
+
+            setupHoverDetection() {
+                const hoverElements = document.querySelectorAll('[data-cursor-hover]');
+                
+                hoverElements.forEach(el => {
+                    el.addEventListener('mouseenter', () => {
+                        this.isHovering = true;
+                        this.dot.classList.add('hovering');
+                        this.ring.classList.add('hovering');
+                    }, { passive: true });
+                    
+                    el.addEventListener('mouseleave', () => {
+                        this.isHovering = false;
+                        this.dot.classList.remove('hovering');
+                        this.ring.classList.remove('hovering');
+                    }, { passive: true });
+                });
+            }
+
+            animate() {
+                this.dotX += (this.targetX - this.dotX) * this.dotSpeed;
+                this.dotY += (this.targetY - this.dotY) * this.dotSpeed;
+                
+                this.ringX += (this.targetX - this.ringX) * this.ringSpeed;
+                this.ringY += (this.targetY - this.ringY) * this.ringSpeed;
+                
+                this.dot.style.left = `${this.dotX}px`;
+                this.dot.style.top = `${this.dotY}px`;
+                this.ring.style.left = `${this.ringX}px`;
+                this.ring.style.top = `${this.ringY}px`;
+                
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        const customCursor = new CustomCursor();
+
+        // ============================================
+        // HERO CTA BUTTON - Perfect Circle Fill
+        // ============================================
+        
+        class HeroButtonFill {
+            constructor() {
+                this.button = document.getElementById('heroCta');
+                
+                if (!this.button) return;
+                
+                this.isTouchDevice = ('ontouchstart' in window) || 
+                                     (navigator.maxTouchPoints > 0);
+                
+                if (!this.isTouchDevice) {
+                    this.init();
+                }
+            }
+
+            init() {
+                this.button.addEventListener('mouseenter', (e) => {
+                    const rect = this.button.getBoundingClientRect();
+                    
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const topLeft = Math.sqrt(x * x + y * y);
+                    const topRight = Math.sqrt((rect.width - x) ** 2 + y * y);
+                    const bottomLeft = Math.sqrt(x * x + (rect.height - y) ** 2);
+                    const bottomRight = Math.sqrt((rect.width - x) ** 2 + (rect.height - y) ** 2);
+                    
+                    const maxDistance = Math.max(topLeft, topRight, bottomLeft, bottomRight);
+                    const size = maxDistance * 2 + 20;
+                    
+                    this.button.style.setProperty('--fill-x', `${x}px`);
+                    this.button.style.setProperty('--fill-y', `${y}px`);
+                    this.button.style.setProperty('--fill-size', `${size}px`);
+                    
+                    this.button.classList.add('filling');
+                }, { passive: true });
+                
+                this.button.addEventListener('mouseleave', () => {
+                    this.button.classList.remove('filling');
+                }, { passive: true });
+            }
+        }
+
+        const heroButtonFill = new HeroButtonFill();
+
+        // ============================================
+        // THEME TOGGLE
+        // ============================================
+        
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // ============================================
+        // HEADER SCROLL EFFECT
+        // ============================================
+        
+        const headerWrapper = document.getElementById('headerWrapper');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 60) {
+                headerWrapper.classList.add('scrolled');
+            } else {
+                headerWrapper.classList.remove('scrolled');
+            }
+        }, { passive: true });
+
+        // ============================================
+        // NORMALIZED FALLING CARDS
+        // ============================================
+        
+        class NormalizedFallingCards {
+            constructor() {
+                this.cards = document.querySelectorAll('.card');
+                this.sectionTrigger = document.getElementById('sectionTrigger');
+                this.section = document.getElementById('cardsSection');
+                this.footer = document.querySelector('footer');
+                this.progressIndicator = document.getElementById('progressIndicator');
+                this.progressFill = document.getElementById('progressFill');
+                this.progressDots = document.querySelectorAll('.progress-dot');
+                
+                this.totalCards = this.cards.length;
+                this.rafId = null;
+                
+                this.config = {
+                    fallDistance: 120,
+                    startScale: 0.75,
+                    endScale: 1.0
+                };
+                
+                this.init();
+            }
+
+            init() {
+                this.cards.forEach(card => {
+                    card.style.opacity = '0';
+                    card.style.transform = `translateY(-${this.config.fallDistance}vh) scale(${this.config.startScale})`;
+                });
+                
+                this.onScroll = this.onScroll.bind(this);
+                this.update = this.update.bind(this);
+                
+                window.addEventListener('scroll', this.onScroll, { passive: true });
+                window.addEventListener('resize', this.onScroll, { passive: true });
+                
+                requestAnimationFrame(this.update);
+            }
+
+            onScroll() {
+                if (this.rafId === null) {
+                    this.rafId = requestAnimationFrame(() => {
+                        this.update();
+                        this.rafId = null;
+                    });
+                }
+            }
+
+            getOffsetTop(element) {
+                let top = 0;
+                while (element) {
+                    top += element.offsetTop;
+                    element = element.offsetParent;
+                }
+                return top;
+            }
+
+            easeOutQuart(t) {
+                return 1 - Math.pow(1 - t, 4);
+            }
+
+            scaleEasing(t) {
+                const start = this.config.startScale;
+                const end = this.config.endScale;
+                
+                if (t < 0.75) {
+                    const fallProgress = t / 0.75;
+                    return start + (0.9 - start) * this.easeOutQuart(fallProgress);
+                } else {
+                    const landProgress = (t - 0.75) / 0.25;
+                    const eased = 1 - Math.pow(1 - landProgress, 3);
+                    const overshoot = Math.sin(landProgress * Math.PI) * 0.025;
+                    return 0.9 + (end - 0.9 + overshoot) * eased;
+                }
+            }
+
+            update() {
+                const vh = window.innerHeight;
+                const scrollY = window.pageYOffset;
+                
+                const triggerTop = this.getOffsetTop(this.sectionTrigger);
+                const footerTop = this.getOffsetTop(this.footer);
+                
+                const animationStart = triggerTop - vh * 0.85;
+                const animationEnd = footerTop - vh * 0.98;
+                
+                const totalRange = animationEnd - animationStart;
+                
+                if (totalRange <= 0) {
+                    this.cards.forEach(card => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0) scale(1)';
+                        card.classList.add('landed');
+                    });
+                    return;
+                }
+                
+                const globalProgress = (scrollY - animationStart) / totalRange;
+                const clampedGlobal = Math.max(0, Math.min(1, globalProgress));
+                
+                let completedCount = 0;
+                let activeCardProgress = 0;
+
+                this.cards.forEach((card, index) => {
+                    const cardStart = index / this.totalCards;
+                    const cardDuration = 1 / this.totalCards;
+                    
+                    let cardProgress = (globalProgress - cardStart) / cardDuration;
+                    cardProgress = Math.max(0, Math.min(1, cardProgress));
+                    
+                    if (cardProgress >= 1) {
+                        completedCount++;
+                    } else if (cardProgress > 0) {
+                        activeCardProgress = cardProgress;
+                    }
+                    
+                    const positionEased = this.easeOutQuart(cardProgress);
+                    const scale = this.scaleEasing(cardProgress);
+                    
+                    const translateY = (1 - positionEased) * -this.config.fallDistance;
+                    const opacity = Math.min(1, cardProgress / 0.25);
+                    
+                    card.style.transform = `translateY(${translateY}vh) scale(${scale})`;
+                    card.style.opacity = opacity.toString();
+                    
+                    // CRITICAL: Only enable pointer events when card is fully landed
+                    if (cardProgress >= 0.98) {
+                        card.classList.add('landed');
+                    } else {
+                        card.classList.remove('landed');
+                    }
+                });
+                
+                this.updateProgress(clampedGlobal, completedCount, activeCardProgress);
+                
+                const inAnimationZone = globalProgress >= -0.1 && globalProgress <= 1.2;
+                if (inAnimationZone) {
+                    this.progressIndicator.classList.add('visible');
+                } else {
+                    this.progressIndicator.classList.remove('visible');
+                }
+            }
+
+            updateProgress(globalProgress, completed, activeProgress) {
+                this.progressDots.forEach((dot, index) => {
+                    dot.classList.remove('active', 'completed');
+                    
+                    if (index < completed) {
+                        dot.classList.add('completed');
+                    } else if (index === completed && activeProgress > 0) {
+                        dot.classList.add('active');
+                    }
+                });
+                
+                const percent = Math.max(0, Math.min(100, globalProgress * 100));
+                this.progressFill.style.height = `${percent}%`;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            
+            if (!prefersReducedMotion) {
+                new NormalizedFallingCards();
+            }
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Ambient orb parallax
+        let mouseX = 0, mouseY = 0;
+        let currentX = 0, currentY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 25;
+            mouseY = (e.clientY / window.innerHeight - 0.5) * 25;
+        }, { passive: true });
+
+        function animateOrbs() {
+            currentX += (mouseX - currentX) * 0.015;
+            currentY += (mouseY - currentY) * 0.015;
+            
+            document.querySelectorAll('.ambient-orb').forEach((orb, index) => {
+                const speed = (index + 1) * 0.35;
+                orb.style.transform = `translate(${currentX * speed}px, ${currentY * speed}px)`;
+            });
+            
+            requestAnimationFrame(animateOrbs);
+        }
+
+        animateOrbs();
+    </script>
+</body>
+</html>
